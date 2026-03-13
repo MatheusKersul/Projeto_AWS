@@ -1,0 +1,40 @@
+version: 0.0
+os: linux
+
+files:
+  - source: /
+    destination: /tmp/codedeploy-app
+
+permissions:
+  - object: /tmp/codedeploy-app
+    owner: appuser
+    group: appuser
+    mode: 755
+    type:
+      - directory
+      - file
+
+hooks:
+  ApplicationStop:
+    - location: codedeploy/application_stop.sh
+      timeout: 300
+      runas: appuser
+  BeforeInstall:
+    - location: codedeploy/before_install.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: codedeploy/fix_permissions.sh
+      timeout: 60
+      runas: root
+    - location: codedeploy/after_install.sh
+      timeout: 600
+      runas: appuser
+  ApplicationStart:
+    - location: codedeploy/application_start.sh
+      timeout: 300
+      runas: appuser
+  ValidateService:
+    - location: codedeploy/validate_service.sh
+      timeout: 120
+      runas: appuser
